@@ -53,7 +53,9 @@ class DotstarDevice:
     def end_frame(self):
         return [0x00] * (int(self.num_LEDs / 128) + 1) * 4
 
-    def state_to_bytes(self, state = self.LEDs_state):
+    def state_to_bytes(self, state = []):
+        if state == []:
+            state = self.LEDs_state
         to_send = [self.tuple_to_bytes(LED) for LED in state]
         return to_send
 
