@@ -1,5 +1,5 @@
 from itertools import permutations
-import spidev.SpiDev()
+import spidev
 
 valid_arrangements = ['linear']
 valid_update_strategies = ['on-command']
