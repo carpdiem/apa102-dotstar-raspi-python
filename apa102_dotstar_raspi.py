@@ -31,7 +31,7 @@ class DotstarDevice:
     def set_LEDs(self, start_idx, end_idx, brightness, r, g, b):
         if start_idx < 0 or start_idx > self.num_LEDs - 1:
             raise ValueError("invalid start index: " + str(start_idx))
-        if end_idx < start_idx or end_idx > self.numLEDs:
+        if end_idx < start_idx or end_idx > self.num_LEDs:
             raise ValueError("invalid end index: " + str(end_idx))
         if brightness not in range(32):
             raise ValueError("invalid brightness value: " + brightness)
