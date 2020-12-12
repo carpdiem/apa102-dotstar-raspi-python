@@ -26,7 +26,7 @@ class DotstarDevice:
             self.update_strategy = update
         self.spi = spidev.SpiDev()
         self.spi.open(self.bus, self.device)
-        self.spi.max_speed_hz = self.max_Hz
+        self.spi.max_speed_hz = int(self.max_Hz)
 
     def set_LEDs(self, start_idx, end_idx, brightness, r, g, b):
         if start_idx < 0 or start_idx > self.num_LEDs - 1:
