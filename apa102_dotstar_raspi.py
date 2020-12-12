@@ -43,6 +43,10 @@ class DotstarDevice:
     def set_LED(self, idx, brightness, r, g, b):
         self.set_LEDs(idx, idx+1, brightness, r, g, b)
 
+    def set_nth_LEDs(self, start_idx, n, brightness, r, g, b):
+        for i in range(start_idx, self.num_LEDs, n):
+            self.set_LED(i, brightness, r, g, b)
+
     def commit_state(self):
         to_send = self.start_frame() + self.state_to_bytes() + self.end_frame()
         self.spi.xfer(to_send)
