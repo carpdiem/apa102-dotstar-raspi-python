@@ -5,7 +5,7 @@ valid_arrangements = ['linear']
 valid_update_strategies = ['on-command']
 
 class DotstarDevice:
-    def __init__(self, num_LEDs, arrangement, color_order, max_Hz = 3000000., bus = 0, device = 0, update = 'on-command'):
+    def __init__(self, num_LEDs, arrangement, color_order, max_Hz = 3000000, bus = 0, device = 0, update = 'on-command'):
         self.num_LEDs = num_LEDs
         # Store LEDs state in (brightness, r, g, b) order
         self.LEDs_state = [(0, 0, 0, 0)] * self.num_LEDs
