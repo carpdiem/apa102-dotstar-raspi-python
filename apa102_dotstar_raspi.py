@@ -80,3 +80,6 @@ class DotstarDevice:
     def commit_off(self):
         to_send = self.start_frame() + self.state_to_bytes([(0, 0, 0, 0)] * self.num_LEDs) + self.end_frame()
         self.spi.xfer(to_send)
+
+    def reset_LEDs_state(self):
+        self.set_LEDs(0, self.num_LEDs, 0, 0, 0, 0)
