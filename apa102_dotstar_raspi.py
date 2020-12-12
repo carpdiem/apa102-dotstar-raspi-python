@@ -57,7 +57,7 @@ class DotstarDevice:
         if state == []:
             state = self.LEDs_state
         to_send = [self.tuple_to_bytes(LED) for LED in state]
-        return to_send
+        return sum(to_send, [])
 
     def tuple_to_bytes(self, t):
         if t[0] not in range(32) or t[1] not in range(256) or t[2] not in range(256) or t[3] not in range(256):
