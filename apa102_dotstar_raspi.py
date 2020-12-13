@@ -34,7 +34,7 @@ class DotstarDevice:
         self.spi.open(self.bus, self.device)
         self.spi.max_speed_hz = int(self.max_Hz)
 
-    def safe_change_LED_state(idx, brightness, r, g, b):
+    def safe_change_LED_state(self, idx, brightness, r, g, b):
         if brightness * r > self.thermal_limit:
             r = int(self.thermal_limit / brightness)
         if brightness * g > self.thermal_limit:
