@@ -34,6 +34,9 @@ class DotstarDevice:
         self.spi.open(self.bus, self.device)
         self.spi.max_speed_hz = int(self.max_Hz)
 
+    def unsafe_change_LED_state(self, idx, brightness, r, g, b):
+        self.LEDs_state[idx] = (brightness, r, g, b)
+
     def safe_change_LED_state(self, idx, brightness, r, g, b):
         if brightness * r > self.thermal_limit:
             r = int(self.thermal_limit / brightness)
@@ -43,7 +46,7 @@ class DotstarDevice:
             b = int(self.thermal_limit / brightness)
         self.LEDs_state[idx] = (brightness, r, g, b)
 
-    def set_LEDs(self, start_idx, end_idx, brightness, r, g, b):
+    def set_LEDs(self, start_idx, end_idx, brightness, r, g, b, safe = True):
         if start_idx < 0 or start_idx > self.num_LEDs - 1:
             raise ValueError("invalid start index: " + str(start_idx))
         if end_idx < start_idx or end_idx > self.num_LEDs:
@@ -53,14 +56,17 @@ class DotstarDevice:
         if r not in range(256) or g not in range(256) or b not in range(256):
             raise ValueError("invalid rgb tuple: (" + str(r) + ", " + str(g) + ", " + str(b) + ")")
         for i in range(start_idx, end_idx):
-            self.set_LED(i, brightness, r, g, b)
+            self.set_LED(i, brightness, r, g, b, safe)
 
-    def set_LED(self, idx, brightness, r, g, b):
-        self.safe_change_LED_state(idx, brightness, r, g, b)
+    def set_LED(self, idx, brightness, r, g, b, safe = True):
+        if safe:
+            self.safe_change_LED_state(idx, brightness, r, g, b)
+        else:
+            self.unsafe_change_LED_state(idx, brightness, r, g, b)
 
-    def set_nth_LEDs(self, start_idx, n, brightness, r, g, b):
+    def set_nth_LEDs(self, start_idx, n, brightness, r, g, b, safe = True):
         for i in range(start_idx, self.num_LEDs, n):
-            self.set_LED(i, brightness, r, g, b)
+            self.set_LED(i, brightness, r, g, b, safe)
 
     def commit_state(self):
         to_send = self.start_frame() + self.state_to_bytes() + self.end_frame()
@@ -98,3 +104,32 @@ class DotstarDevice:
 
     def reset_LEDs_state(self):
         self.set_LEDs(0, self.num_LEDs, 0, 0, 0, 0)
+
+    def set_LEDs_best_match_float_rgb(self, r, g, b, max_pattern_width = 6):
+        def n_batch_config(n, r, g, b, max_level, max_pattern_width = max_pattern_width):
+            n = int(n)
+            if n < 1 or n > max_pattern_width:
+                raise ValueError("requested pattern is too large: n = " + str(n))
+            
+            return res
+
+        def config_to_floats(cfg, max_level):
+            r, g, b = 0., 0., 0.
+            r = sum([1.0 * led[0] * led[1] / max_level for led in cfg]) / len(cfg)
+            g = sum([1.0 * led[0] * led[2] / max_level for led in cfg]) / len(cfg)
+            b = sum([1.0 * led[0] * led[3] / max_level for led in cfg]) / len(cfg)
+            return (r, g, b)
+
+        def mean_squared_error(d0, d1):
+            residuals = [((d0[i] - d1[i]) / d0[i])**2.0 for i in range(len(d0))]
+            return sum(residuals) / len(residuals)
+
+        config_options = [n_batch_config(n, r, g, b, self.thermal_limit) for n in range(1, max_pattern_width + 1)]
+        errors = [mean_squared_error((r, g, b), config_to_floats(cfg)) for cfg in config_options]
+        best_config = config_options[errors.index(min(errors))]
+
+        # now set the config
+        pattern_length = len(best_config)
+        self.reset_LEDs_state()
+        for idx, led in enumerate(best_config):
+            self.set_nth_LEDs(idx, led[0], led[1], led[2], led[3], safe = False)
