@@ -1,3 +1,5 @@
+from numpy import log, array
+from copy import deepcopy
 from itertools import permutations
 import spidev
 
@@ -110,8 +112,66 @@ class DotstarDevice:
             n = int(n)
             if n < 1 or n > max_pattern_width:
                 raise ValueError("requested pattern is too large: n = " + str(n))
+            if any([i < 0. or i > 1. for i in [r, g, b]]):
+                raise ValueError("invalid rgb float tuple: " + str(r) + ", " + str(g) + ", " + str(b)
+            irgbs = [int(r * max_level), int(g * max_level), int(b * max_level)]
             
-            return res
+            def gen_sorted_idx_lookups(irgbs):
+                irgbs_sorted = deepcopy(irgbs)
+                irgbs_sorted.sort()
+                irgbs_sorted = [[i, False] for i in irgbs_sorted]
+                irgbs_flags = [[i, False] for i in irgbs]
+                idx_lookups = []
+                for i in irgbs_sorted:
+                    idx = irgbs_flags.index(i)
+                    idx_lookups += [idx]
+                    irgbs_flags[idx][1] = True
+                return idx_lookups
+
+            def LED_to_irgbs(led):
+                return [led[0] * led[1], led[0], * led[2], led[0] * led[3]]
+
+            def recursive_n_config(n, irgbs):
+                def compute_log_error(desired_irgbs, test_irgbs):
+                    res = 1.0
+                    for pair in zip(desired_irgbs, test_irgbs):
+                        if pair[1] <= pair[0]:
+                            res *= (log(pair[0]+1) - log(pair[1]+1) + 1)
+                        else:
+                            res *= 2.0 * (log(pair[0] + 1) + 1)
+                    return res
+
+                def find_best_incremental_LED(irgbs):
+                # use a "growing" strategy. start the test_irgb at (1, 0, 0, 0) and test out all four options of +1 to see which
+                #   (including the current point) produces the least log_error. Then make that step and repeat the function
+                #   until you end up with the least error produced by the current point. Then return the current point.
+                    current_point = (1, 0, 0, 0)
+                    next_point = (0, 0, 0, 0)
+                    while next_point != current_point:
+                        candidate_points = [(current_point[0] + 1, current_point[1], current_point[2], current_point[3]),
+                                            (current_point[0], current_point[1] + 1, current_point[2], current_point[3]),
+                                            (current_point[0], current_point[1], current_point[2] + 1, current_point[3]),
+                                            (current_point[0], current_point[1], current_point[2], current_point[3] + 1),
+                                            (current_point[0], current_point[1], current_point[2], current_point[3])]
+                        candidate_errors = [compute_log_error(irgbs, LED_to_irgbs(led)) for led in candidate_points]
+                        next_point = candidate_points[candidate_errors.index(min(candidate_errors))]
+                    return current_point
+
+                if n == 1:
+                    return [find_best_incremental_LED(irgbs)]
+                elif n > 1:
+                    best_LED = find_best_incremental_LED(irgbs)
+                    # irgb_residuals = irgbs - irgb_vals(led)
+                    return [find_best_incremental_LED(irgbs)] + recursive_n_config(n - 1, irgb_residuals)
+
+            res = recursive_n_config(n, irgbs)
+
+            
+            def adjust_ordering(res):
+            # change the ordering of the LEDs, so they are maximally mixed with bright and dim LEDs next to each other
+                return res
+
+            return adjust_ordering(res)
 
         def config_to_floats(cfg, max_level):
             r, g, b = 0., 0., 0.
