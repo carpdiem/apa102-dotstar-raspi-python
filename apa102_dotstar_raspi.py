@@ -131,7 +131,7 @@ class DotstarDevice:
             def LED_to_irgbs(led):
                 return [led[0] * led[1], led[0] * led[2], led[0] * led[3]]
 
-            def recursive_n_config(n, irgbs):
+            def recursive_n_config(n, irgbs, n_original):
                 def find_best_incremental_LED(irgbs):
                 # use a "growing" strategy. start the test_irgb at (1, 0, 0, 0) and test out all four options of +1 to see which
                 #   (including the current point) produces the least log_error. Then make that step and repeat the function
@@ -158,10 +158,11 @@ class DotstarDevice:
                     return [find_best_incremental_LED(irgbs)]
                 elif n > 1:
                     best_LED = find_best_incremental_LED(irgbs)
-                    # irgb_residuals = irgbs - irgb_vals(led)
-                    return [find_best_incremental_LED(irgbs)] + recursive_n_config(n - 1, irgb_residuals)
+                    best_LED_irgbs = [best_LED[0] * best_LED[1] / n_original, best_LED[0] * best_LED[2] / n_original, best_LED[0] * best_LED[3] / n_original]
+                    irgb_residuals = irgbs - best_LED_irgbs
+                    return [best_LED] + recursive_n_config(n - 1, irgb_residuals, n_original)
 
-            res = recursive_n_config(n, irgbs)
+            res = recursive_n_config(n, irgbs, n)
                 
             def adjust_ordering(res):
             # change the ordering of the LEDs, so they are maximally mixed with bright and dim LEDs next to each other
