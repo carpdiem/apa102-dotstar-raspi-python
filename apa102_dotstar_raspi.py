@@ -137,11 +137,11 @@ class DotstarDevice:
                 #   (including the current point) produces the least log_error. Then make that step and repeat the function
                 #   until you end up with the least error produced by the current point. Then return the current point.
                     ### ↓↓↓ check if this shouldn't be current_point = (1, 0, 0, 0) instead!!!
-                    current_point = (1, 0, 0, 0)
-                    next_point = (0, 0, 0, 0)
+                    current_point = (0, 0, 0, 0)
+                    next_point = (1, 0, 0, 0)
                     while next_point != current_point:
                         current_point = deepcopy(next_point)
-                        candidate_points = []
+                        candidate_points = [(current_point[0], current_point[1], current_point[2], current_point[3])]
                         if current_point[0] < 31:
                             candidate_points += [(current_point[0] + 1, current_point[1], current_point[2], current_point[3])]
                         if current_point[1] < 255:
@@ -150,7 +150,7 @@ class DotstarDevice:
                             candidate_points += [(current_point[0], current_point[1], current_point[2] + 1, current_point[3])]
                         if current_point[3] < 255:
                             candidate_points += [(current_point[0], current_point[1], current_point[2], current_point[3] + 1)]
-                        candidate_points += [(current_point[0], current_point[1], current_point[2], current_point[3])]
+#                        candidate_points += [(current_point[0], current_point[1], current_point[2], current_point[3])]
                         candidate_errors = [compute_log_error(irgbs, LED_to_irgbs(led, n_original)) for led in candidate_points]
                         next_point = candidate_points[candidate_errors.index(min(candidate_errors))]
                     return current_point
