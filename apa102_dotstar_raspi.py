@@ -159,7 +159,7 @@ class DotstarDevice:
                 elif n > 1:
                     best_LED = find_best_incremental_LED(irgbs)
                     best_LED_irgbs = [best_LED[0] * best_LED[1] / n_original, best_LED[0] * best_LED[2] / n_original, best_LED[0] * best_LED[3] / n_original]
-                    irgb_residuals = [irgbs[0] - best_LED_irgbs[0], irgbs[1] - best_LED_irgbs[1], irgbs[2] - best_LED_irgbs[2], irgbs[3] - best_LED_irgbs[3]]
+                    irgb_residuals = [irgbs[0] - best_LED_irgbs[0], irgbs[1] - best_LED_irgbs[1], irgbs[2] - best_LED_irgbs[2]]
                     return [best_LED] + recursive_n_config(n - 1, irgb_residuals, n_original)
 
             res = recursive_n_config(n, irgbs, n)
