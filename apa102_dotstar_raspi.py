@@ -209,4 +209,4 @@ class DotstarDevice:
         pattern_length = len(best_config)
         self.reset_LEDs_state()
         for idx, led in enumerate(best_config):
-            self.set_nth_LEDs(idx, led[0], led[1], led[2], led[3], safe = False)
+            self.set_nth_LEDs(idx, pattern_length, led[0], led[1], led[2], led[3], safe = False)
