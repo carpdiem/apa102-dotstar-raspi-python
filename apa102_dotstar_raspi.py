@@ -113,7 +113,7 @@ class DotstarDevice:
             if n < 1 or n > max_pattern_width:
                 raise ValueError("requested pattern is too large: n = " + str(n))
             if any([i < 0. or i > 1. for i in [r, g, b]]):
-                raise ValueError("invalid rgb float tuple: " + str(r) + ", " + str(g) + ", " + str(b)
+                raise ValueError("invalid rgb float tuple: " + str(r) + ", " + str(g) + ", " + str(b))
             irgbs = [int(r * max_level), int(g * max_level), int(b * max_level)]
             
             def gen_sorted_idx_lookups(irgbs):
