@@ -206,7 +206,7 @@ class DotstarDevice:
 
         config_options = [n_batch_config(n, r, g, b, self.thermal_limit) for n in range(1, max_pattern_width + 1)]
 #        errors = [mean_squared_error((r, g, b), config_to_floats(cfg, self.thermal_limit)) for cfg in config_options]
-        errors = [compute_log_error([int(r * self.thermal_limit), int(g * self.thermal_limit), int(b * self.thermal_limit)], config_to_irgbs(cfg)) for cfg in config_options]
+        errors = [compute_log_error([r * self.thermal_limit, g * self.thermal_limit, b * self.thermal_limit], config_to_irgbs(cfg)) for cfg in config_options]
         print(config_options)
         print(errors)
         best_config = config_options[errors.index(min(errors))]
