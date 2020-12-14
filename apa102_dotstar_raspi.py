@@ -176,6 +176,17 @@ class DotstarDevice:
             b = sum([1.0 * led[0] * led[3] / max_level for led in cfg]) / len(cfg)
             return (r, g, b)
 
+        def config_to_irgbs(cfg):
+            r, g, b = 0, 0, 0
+            for led in cfg:
+                r += led[0] * led[1]
+                g += led[0] * led[2]
+                b += led[0] * led[3]
+            r /= len(cfg)
+            g /= len(cfg)
+            b /= len(cfg)
+            return (r, g, b)
+
         def mean_squared_error(d0, d1):
             residuals = [((d0[i] - d1[i]) / d0[i])**2.0 for i in range(len(d0))]
             return sum(residuals) / len(residuals)
@@ -190,8 +201,8 @@ class DotstarDevice:
             return res
 
         config_options = [n_batch_config(n, r, g, b, self.thermal_limit) for n in range(1, max_pattern_width + 1)]
-        errors = [mean_squared_error((r, g, b), config_to_floats(cfg, self.thermal_limit)) for cfg in config_options]
-#        errors = [compute_log_error([int(r * self.thermal_limit), int(g * self.thermal_limit), int(b * self.thermal_limit)], 
+#        errors = [mean_squared_error((r, g, b), config_to_floats(cfg, self.thermal_limit)) for cfg in config_options]
+        errors = [compute_log_error([int(r * self.thermal_limit), int(g * self.thermal_limit), int(b * self.thermal_limit)], config_to_irgbs(cfg)) for cfg in config_options]
         best_config = config_options[errors.index(min(errors))]
 
         # now set the config
