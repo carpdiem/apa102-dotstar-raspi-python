@@ -187,6 +187,8 @@ class DotstarDevice:
             r /= len(cfg)
             g /= len(cfg)
             b /= len(cfg)
+            print(cfg)
+            print((r, g, b))
             return (r, g, b)
 
         def mean_squared_error(d0, d1):
