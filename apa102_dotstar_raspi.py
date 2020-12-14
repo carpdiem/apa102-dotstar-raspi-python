@@ -66,8 +66,8 @@ class DotstarDevice:
         else:
             self.unsafe_change_LED_state(idx, brightness, r, g, b)
 
-    def set_nth_LEDs(self, start_idx, n, brightness, r, g, b, safe = True):
-        for i in range(start_idx, self.num_LEDs, n):
+    def set_nth_LEDs(self, start_idx, end_idx, n, brightness, r, g, b, safe = True):
+        for i in range(start_idx, end_idx, n):
             self.set_LED(i, brightness, r, g, b, safe)
 
     def commit_state(self):
@@ -107,7 +107,7 @@ class DotstarDevice:
     def reset_LEDs_state(self):
         self.set_LEDs(0, self.num_LEDs, 0, 0, 0, 0)
 
-    def set_LEDs_best_match_float_rgb(self, r, g, b, max_pattern_width = 6):
+    def set_LEDs_best_match_float_rgb(self, start_idx, end_idx, r, g, b, max_pattern_width = 6):
         def n_batch_config(n, r, g, b, max_level, max_pattern_width = max_pattern_width):
             n = int(n)
             if n < 1 or n > max_pattern_width:
@@ -137,7 +137,7 @@ class DotstarDevice:
                 #   (including the current point) produces the least log_error. Then make that step and repeat the function
                 #   until you end up with the least error produced by the current point. Then return the current point.
                     ### ↓↓↓ check if this shouldn't be current_point = (1, 0, 0, 0) instead!!!
-                    current_point = (1, 1, 1, 1)
+                    current_point = (1, 0, 0, 0)
                     next_point = (0, 0, 0, 0)
                     while next_point != current_point:
                         current_point = deepcopy(next_point)
@@ -215,4 +215,4 @@ class DotstarDevice:
         pattern_length = len(best_config)
         self.reset_LEDs_state()
         for idx, led in enumerate(best_config):
-            self.set_nth_LEDs(idx, pattern_length, led[0], led[1], led[2], led[3], safe = False)
+            self.set_nth_LEDs(start_idx + idx, end_idx, pattern_length, led[0], led[1], led[2], led[3], safe = False)
