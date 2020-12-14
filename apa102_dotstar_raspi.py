@@ -128,8 +128,8 @@ class DotstarDevice:
 #                    irgbs_flags[idx][1] = True
 #                return idx_lookups
 
-            def LED_to_irgbs(led):
-                return [led[0] * led[1], led[0] * led[2], led[0] * led[3]]
+            def LED_to_irgbs(led, n):
+                return [1. * led[0] * led[1] / n, 1. * led[0] * led[2] / n, 1. * led[0] * led[3] / n]
 
             def recursive_n_config(n, irgbs, n_original):
                 def find_best_incremental_LED(irgbs):
@@ -150,7 +150,7 @@ class DotstarDevice:
                         if current_point[3] < 255:
                             candidate_points += [(current_point[0], current_point[1], current_point[2], current_point[3] + 1)]
                         candidate_points += [(current_point[0], current_point[1], current_point[2], current_point[3])]
-                        candidate_errors = [compute_log_error(irgbs, LED_to_irgbs(led)) for led in candidate_points]
+                        candidate_errors = [compute_log_error(irgbs, LED_to_irgbs(led, n_original)) for led in candidate_points]
                         next_point = candidate_points[candidate_errors.index(min(candidate_errors))]
                     return current_point
 
