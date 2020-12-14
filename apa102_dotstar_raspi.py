@@ -139,6 +139,7 @@ class DotstarDevice:
                     current_point = (1, 1, 1, 1)
                     next_point = (0, 0, 0, 0)
                     while next_point != current_point:
+                        current_point = deepcopy(next_point)
                         candidate_points = [(current_point[0] + 1, current_point[1], current_point[2], current_point[3]),
                                             (current_point[0], current_point[1] + 1, current_point[2], current_point[3]),
                                             (current_point[0], current_point[1], current_point[2] + 1, current_point[3]),
