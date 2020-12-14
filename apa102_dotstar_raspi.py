@@ -140,11 +140,16 @@ class DotstarDevice:
                     next_point = (0, 0, 0, 0)
                     while next_point != current_point:
                         current_point = deepcopy(next_point)
-                        candidate_points = [(current_point[0] + 1, current_point[1], current_point[2], current_point[3]),
-                                            (current_point[0], current_point[1] + 1, current_point[2], current_point[3]),
-                                            (current_point[0], current_point[1], current_point[2] + 1, current_point[3]),
-                                            (current_point[0], current_point[1], current_point[2], current_point[3] + 1),
-                                            (current_point[0], current_point[1], current_point[2], current_point[3])]
+                        candidate_points = []
+                        if current_point[0] < 31:
+                            candidate_points += [(current_point[0] + 1, current_point[1], current_point[2], current_point[3])]
+                        if current_point[1] < 255:
+                            candidate_points += [(current_point[0], current_point[1] + 1, current_point[2], current_point[3])]
+                        if current_point[2] < 255:
+                            candidate_points += [(current_point[0], current_point[1], current_point[2] + 1, current_point[3])]
+                        if current_point[3] < 255:
+                            candidate_points += [(current_point[0], current_point[1], current_point[2], current_point[3] + 1)]
+                        candidate_points += [(current_point[0], current_point[1], current_point[2], current_point[3])]
                         candidate_errors = [compute_log_error(irgbs, LED_to_irgbs(led)) for led in candidate_points]
                         next_point = candidate_points[candidate_errors.index(min(candidate_errors))]
                     return current_point
@@ -185,7 +190,7 @@ class DotstarDevice:
             return res
 
         config_options = [n_batch_config(n, r, g, b, self.thermal_limit) for n in range(1, max_pattern_width + 1)]
-        errors = [mean_squared_error((r, g, b), config_to_floats(cfg)) for cfg in config_options]
+        errors = [mean_squared_error((r, g, b), config_to_floats(cfg, self.thermal_limit)) for cfg in config_options]
 #        errors = [compute_log_error([int(r * self.thermal_limit), int(g * self.thermal_limit), int(b * self.thermal_limit)], 
         best_config = config_options[errors.index(min(errors))]
 
