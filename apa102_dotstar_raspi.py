@@ -116,31 +116,22 @@ class DotstarDevice:
                 raise ValueError("invalid rgb float tuple: " + str(r) + ", " + str(g) + ", " + str(b))
             irgbs = [int(r * max_level), int(g * max_level), int(b * max_level)]
             
-            def gen_sorted_idx_lookups(irgbs):
-                irgbs_sorted = deepcopy(irgbs)
-                irgbs_sorted.sort()
-                irgbs_sorted = [[i, False] for i in irgbs_sorted]
-                irgbs_flags = [[i, False] for i in irgbs]
-                idx_lookups = []
-                for i in irgbs_sorted:
-                    idx = irgbs_flags.index(i)
-                    idx_lookups += [idx]
-                    irgbs_flags[idx][1] = True
-                return idx_lookups
+#            def gen_sorted_idx_lookups(irgbs):
+#                irgbs_sorted = deepcopy(irgbs)
+#                irgbs_sorted.sort()
+#                irgbs_sorted = [[i, False] for i in irgbs_sorted]
+#                irgbs_flags = [[i, False] for i in irgbs]
+#                idx_lookups = []
+#                for i in irgbs_sorted:
+#                    idx = irgbs_flags.index(i)
+#                    idx_lookups += [idx]
+#                    irgbs_flags[idx][1] = True
+#                return idx_lookups
 
             def LED_to_irgbs(led):
                 return [led[0] * led[1], led[0], * led[2], led[0] * led[3]]
 
             def recursive_n_config(n, irgbs):
-                def compute_log_error(desired_irgbs, test_irgbs):
-                    res = 1.0
-                    for pair in zip(desired_irgbs, test_irgbs):
-                        if pair[1] <= pair[0]:
-                            res *= (log(pair[0]+1) - log(pair[1]+1) + 1)
-                        else:
-                            res *= 2.0 * (log(pair[0] + 1) + 1)
-                    return res
-
                 def find_best_incremental_LED(irgbs):
                 # use a "growing" strategy. start the test_irgb at (1, 0, 0, 0) and test out all four options of +1 to see which
                 #   (including the current point) produces the least log_error. Then make that step and repeat the function
@@ -164,12 +155,11 @@ class DotstarDevice:
                     # irgb_residuals = irgbs - irgb_vals(led)
                     return [find_best_incremental_LED(irgbs)] + recursive_n_config(n - 1, irgb_residuals)
 
-            res = recursive_n_config(n, irgbs)
-
-            
-            def adjust_ordering(res):
-            # change the ordering of the LEDs, so they are maximally mixed with bright and dim LEDs next to each other
-                return res
+                res = recursive_n_config(n, irgbs)
+                
+                def adjust_ordering(res):
+                # change the ordering of the LEDs, so they are maximally mixed with bright and dim LEDs next to each other
+                    return res
 
             return adjust_ordering(res)
 
@@ -184,8 +174,18 @@ class DotstarDevice:
             residuals = [((d0[i] - d1[i]) / d0[i])**2.0 for i in range(len(d0))]
             return sum(residuals) / len(residuals)
 
+        def compute_log_error(desired_irgbs, test_irgbs):
+            res = 1.0
+            for pair in zip(desired_irgbs, test_irgbs):
+                if pair[1] <= pair[0]:
+                    res *= (log(pair[0]+1) - log(pair[1]+1) + 1)
+                else:
+                    res *= 2.0 * (log(pair[0] + 1) + 1)
+            return res
+
         config_options = [n_batch_config(n, r, g, b, self.thermal_limit) for n in range(1, max_pattern_width + 1)]
         errors = [mean_squared_error((r, g, b), config_to_floats(cfg)) for cfg in config_options]
+#        errors = [compute_log_error([int(r * self.thermal_limit), int(g * self.thermal_limit), int(b * self.thermal_limit)], 
         best_config = config_options[errors.index(min(errors))]
 
         # now set the config
