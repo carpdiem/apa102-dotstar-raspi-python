@@ -136,7 +136,7 @@ class DotstarDevice:
                 # use a "growing" strategy. start the test_irgb at (1, 0, 0, 0) and test out all four options of +1 to see which
                 #   (including the current point) produces the least log_error. Then make that step and repeat the function
                 #   until you end up with the least error produced by the current point. Then return the current point.
-                    current_point = (1, 0, 0, 0)
+                    current_point = (1, 1, 1, 1)
                     next_point = (0, 0, 0, 0)
                     while next_point != current_point:
                         candidate_points = [(current_point[0] + 1, current_point[1], current_point[2], current_point[3]),
