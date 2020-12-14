@@ -114,7 +114,7 @@ class DotstarDevice:
                 raise ValueError("requested pattern is too large: n = " + str(n))
             if any([i < 0. or i > 1. for i in [r, g, b]]):
                 raise ValueError("invalid rgb float tuple: " + str(r) + ", " + str(g) + ", " + str(b))
-            irgbs = [int(r * max_level), int(g * max_level), int(b * max_level)]
+            irgbs = [r * max_level, g * max_level, b * max_level]
             
 #            def gen_sorted_idx_lookups(irgbs):
 #                irgbs_sorted = deepcopy(irgbs)
@@ -136,6 +136,7 @@ class DotstarDevice:
                 # use a "growing" strategy. start the test_irgb at (1, 0, 0, 0) and test out all four options of +1 to see which
                 #   (including the current point) produces the least log_error. Then make that step and repeat the function
                 #   until you end up with the least error produced by the current point. Then return the current point.
+                    ### ↓↓↓ check if this shouldn't be current_point = (1, 0, 0, 0) instead!!!
                     current_point = (1, 1, 1, 1)
                     next_point = (0, 0, 0, 0)
                     while next_point != current_point:
