@@ -229,7 +229,7 @@ class DotstarDevice:
         # cycle the best_config a random number of times to evenly distribute % chance of any LED being the MAX LED.
         # the point of this is to make sure that we're not always blasting THE SAME LEDs with the high brightnesses,
         #   and thereby, high heats, in order to prolong the LED lifetimes :)
-        cycle_offset = randrang(0, pattern_length)
+        cycle_offset = randrange(0, pattern_length)
         best_config = best_config[cycle_offset:] + best_config[:cycle_offset]
 
         self.reset_LEDs_state()
