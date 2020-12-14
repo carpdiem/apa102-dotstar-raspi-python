@@ -153,6 +153,11 @@ class DotstarDevice:
 #                        candidate_points += [(current_point[0], current_point[1], current_point[2], current_point[3])]
                         candidate_errors = [compute_log_error(irgbs, LED_to_irgbs(led, n_original)) for led in candidate_points]
                         next_point = candidate_points[candidate_errors.index(min(candidate_errors))]
+                        if debug:
+                            print("point iteration!!!!!")
+                            print(candidate_points)
+                            print(candidate_errors)
+                            print(next_point)
                     return current_point
 
                 if n == 1:
