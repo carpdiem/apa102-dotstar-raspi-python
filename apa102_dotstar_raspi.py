@@ -1,4 +1,4 @@
-from numpy import log, array
+from numpy import log, array, ceil
 from copy import deepcopy
 from itertools import permutations
 import spidev
@@ -165,9 +165,13 @@ class DotstarDevice:
 
             res = recursive_n_config(n, irgbs, n)
                 
-            def adjust_ordering(res):
+            def adjust_ordering(cfg):
             # change the ordering of the LEDs, so they are maximally mixed with bright and dim LEDs next to each other
-                return res
+                cfg.sort(key=(lambda x: x[0] * x[1] + x[0] * x[2] + x[0] * x[3]))
+                def alternating_index(i):
+                    # produces indices like 0, -1, 1, -2, 2, -3, ...
+                    return int((-1)**i * ceil(i / 2))
+                return [cfg[alternating_index(i)] for i, _ in enumerate(cfg)]
 
             return adjust_ordering(res)
 
