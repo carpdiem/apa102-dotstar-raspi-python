@@ -155,11 +155,11 @@ class DotstarDevice:
                     # irgb_residuals = irgbs - irgb_vals(led)
                     return [find_best_incremental_LED(irgbs)] + recursive_n_config(n - 1, irgb_residuals)
 
-                res = recursive_n_config(n, irgbs)
+            res = recursive_n_config(n, irgbs)
                 
-                def adjust_ordering(res):
-                # change the ordering of the LEDs, so they are maximally mixed with bright and dim LEDs next to each other
-                    return res
+            def adjust_ordering(res):
+            # change the ordering of the LEDs, so they are maximally mixed with bright and dim LEDs next to each other
+                return res
 
             return adjust_ordering(res)
 
