@@ -107,7 +107,7 @@ class DotstarDevice:
     def reset_LEDs_state(self):
         self.set_LEDs(0, self.num_LEDs, 0, 0, 0, 0)
 
-    def set_LEDs_best_match_float_rgb(self, start_idx, end_idx, r, g, b, max_pattern_width = 6):
+    def set_LEDs_best_match_float_rgb(self, start_idx, end_idx, r, g, b, max_pattern_width = 6, debug = False):
         def n_batch_config(n, r, g, b, max_level, max_pattern_width = max_pattern_width):
             n = int(n)
             if n < 1 or n > max_pattern_width:
@@ -191,8 +191,9 @@ class DotstarDevice:
             r /= len(cfg)
             g /= len(cfg)
             b /= len(cfg)
-            print(cfg)
-            print((r, g, b))
+            if debug:
+                print(cfg)
+                print((r, g, b))
             return (r, g, b)
 
         def mean_squared_error(d0, d1):
@@ -211,8 +212,9 @@ class DotstarDevice:
         config_options = [n_batch_config(n, r, g, b, self.thermal_limit) for n in range(1, max_pattern_width + 1)]
 #        errors = [mean_squared_error((r, g, b), config_to_floats(cfg, self.thermal_limit)) for cfg in config_options]
         errors = [compute_log_error([r * self.thermal_limit, g * self.thermal_limit, b * self.thermal_limit], config_to_irgbs(cfg)) for cfg in config_options]
-        print(config_options)
-        print(errors)
+        if debug:
+            print(config_options)
+            print(errors)
         best_config = config_options[errors.index(min(errors))]
 
         # now set the config
