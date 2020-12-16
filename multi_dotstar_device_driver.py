@@ -44,3 +44,6 @@ class MultiDotstarController:
 
     def commit_all_off(self):
         self.control_interface.commit_off()
+
+    def commit_all_on(self):
+        self.control_interface.commit_state()
