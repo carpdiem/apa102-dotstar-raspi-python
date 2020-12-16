@@ -3,6 +3,7 @@ from numpy import log, array, ceil
 from copy import deepcopy
 from itertools import permutations
 import spidev
+import Color_Match as cm
 
 valid_arrangements = ['linear']
 valid_update_strategies = ['on-command']
