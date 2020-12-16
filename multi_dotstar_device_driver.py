@@ -16,7 +16,7 @@ class MultiDotstarController:
                          '0 ≤ l1 ≤ 1e-6': 0. <= cfg['l1'] <= 1.e-6,
                          '0 ≤ l2 ≤ 1e-6': 0. <= cfg['l2'] <= 1.e-6,
                          '0 ≤ l3 ≤ 1e-6': 0. <= cfg['l3'] <= 1.e-6}
-                if not all(test.values()):
+                if not all(tests.values()):
                     raise RuntimeError('Error - invalid subdevice configuration. Test results: ' + str(tests))
             for idx in range(len(cfgs))[:-1]:
                 if cfgs[idx]['end_idx'] != cfgs[idx + 1]['start_idx']:
