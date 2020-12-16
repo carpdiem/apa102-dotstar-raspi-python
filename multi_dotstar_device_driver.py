@@ -41,3 +41,6 @@ class MultiDotstarController:
 
         sv = cm.sense_vector(cm.planck_spectrum(color_temp))
         self.match_sense_vector(sv, brightness)
+
+    def commit_all_off(self):
+        self.control_interface.commit_off()
