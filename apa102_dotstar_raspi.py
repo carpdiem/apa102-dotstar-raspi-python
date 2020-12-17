@@ -109,7 +109,7 @@ class DotstarDevice:
     def reset_LEDs_state(self):
         self.set_LEDs(0, self.num_LEDs, 0, 0, 0, 0)
 
-    def set_LEDs_best_match_float_rgb(self, start_idx, end_idx, r, g, b, max_pattern_width = 6, debug = False):
+    def set_LEDs_best_match_float_rgb(self, start_idx, end_idx, r, g, b, max_pattern_width = 6, debug = False, precompute = False):
         def n_batch_config(n, r, g, b, max_level, max_pattern_width = max_pattern_width):
             n = int(n)
             if n < 1 or n > max_pattern_width:
@@ -233,8 +233,22 @@ class DotstarDevice:
         cycle_offset = randrange(0, pattern_length)
         best_config = best_config[cycle_offset:] + best_config[:cycle_offset]
 
-        for idx, led in enumerate(best_config):
-            self.set_nth_LEDs(start_idx + idx, end_idx, pattern_length, led[0], led[1], led[2], led[3], safe = False)
+        if precompute:
+            tmp = deepcopy(self.LEDs_state)
+            self.set_pattern(start_idx, end_idx, best_config, safe = False)
+            precompute_res = deepcopy(self.LEDs_state)
+            self.unsafe_raw_set_LEDs_state(tmp)
+            return precompute_res
+        else:
+            self.set_pattern(start_idx, end_idx, best_config, safe = False)
+            
+
+    def set_pattern(self, start_idx, end_idx, pattern, safe = True):
+        for idx, led in enumerate(pattern):
+            self.set_nth_LEDs(start_idx + idx, end_idx, len(pattern), led[0], led[1], led[2], led[3], safe = safe)
+
+    def unsafe_raw_set_LEDs_state(self, state):
+        self.LEDs_state = deepcopy(state)
 
 
 class MultiDotstarController:
