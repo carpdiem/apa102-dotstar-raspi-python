@@ -310,4 +310,4 @@ class MultiDotstarController:
         if x > 6./29.:
             return x**3.0
         else:
-            return (x - 4./29.) / (1./3. * (29./6.)**2.0
+            return (x - 4./29.) / (1./3. * (29./6.)**2.)
