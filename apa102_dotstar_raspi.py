@@ -9,7 +9,7 @@ valid_arrangements = ['linear']
 valid_update_strategies = ['on-command']
 
 class DotstarDevice:
-    def __init__(self, num_LEDs, arrangement, color_order, thermal_protection_limit = False, max_Hz = 3000000, bus = 0, device = 0, update = 'on-command'):
+    def __init__(self, num_LEDs, arrangement, color_order, thermal_protection_limit = False, max_Hz = 3000000, bus = 0, device = 0, update = 'on-command', dummy = False):
         self.num_LEDs = num_LEDs
         # Store LEDs state in (brightness, r, g, b) order
         self.LEDs_state = [(0, 0, 0, 0)] * self.num_LEDs
@@ -34,9 +34,10 @@ class DotstarDevice:
             raise ValueError("invalid update strategy")
         else:
             self.update_strategy = update
-        self.spi = spidev.SpiDev()
-        self.spi.open(self.bus, self.device)
-        self.spi.max_speed_hz = int(self.max_Hz)
+        if not dummy:
+            self.spi = spidev.SpiDev()
+            self.spi.open(self.bus, self.device)
+            self.spi.max_speed_hz = int(self.max_Hz)
 
     def unsafe_change_LED_state(self, idx, brightness, r, g, b):
         self.LEDs_state[idx] = (brightness, r, g, b)
@@ -275,8 +276,7 @@ class MultiDotstarController:
         check_integrity(subdevice_configs)
         self.total_num_LEDs = subdevice_configs[-1]['end_idx']
         self.subdevice_configs = subdevice_configs
-        if not dummy:
-            self.control_interface = DotstarDevice(self.total_num_LEDs, 'linear', color_order, thermal_protection_limit = thermal_protection_limit, max_Hz = max_Hz, bus = bus, device = device, update = update)
+        self.control_interface = DotstarDevice(self.total_num_LEDs, 'linear', color_order, thermal_protection_limit = thermal_protection_limit, max_Hz = max_Hz, bus = bus, device = device, update = update, dummy = dummy)
 
     def match_sense_vector_on_subdevice(self, cfg, sv, brightness):
         rgbs = brightness * cm.rgb_composition(cfg['l1'], cfg['l2'], cfg['l3'], sv)
