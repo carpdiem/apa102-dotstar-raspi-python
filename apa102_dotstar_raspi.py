@@ -290,6 +290,8 @@ class MultiDotstarController:
         if brightness < 0. or brightness > 1.:
             raise ValueError('Invalid brightness value: ' + str(brightness))
 
+        brightness = self.visual_to_absolute_brightness(brightness)
+
         if precompute:
             tmp = deepcopy(self.control_interface.LEDs_state)
         sv = cm.sense_vector(cm.planck_spectrum(color_temp))
