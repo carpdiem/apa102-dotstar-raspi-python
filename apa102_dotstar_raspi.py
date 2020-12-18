@@ -304,3 +304,12 @@ class MultiDotstarController:
 
     def commit_all_on(self):
         self.control_interface.commit_state()
+
+    def visual_to_absolute_brightness(self, b):
+        def f(x):
+            if x > (6./29.)**3.0:
+                return x**(1./3.)
+            else:
+                return 1./3. * (29./6.)**2.0 * x + 4./29.
+        return 116. * f(b) - 16.
+
