@@ -252,7 +252,7 @@ class DotstarDevice:
 
 
 class MultiDotstarController:
-    def __init__(self, subdevice_configs, color_order, thermal_protection_limit = False, max_Hz = 3000000, bus = 0, device = 0, update = 'on-command'):
+    def __init__(self, subdevice_configs, color_order, thermal_protection_limit = False, max_Hz = 3000000, bus = 0, device = 0, update = 'on-command', dummy = False):
         def check_integrity(cfgs):
             for cfg in cfgs:
                 tests = {'has start_idx': 'start_idx' in cfg.keys(),
@@ -275,7 +275,8 @@ class MultiDotstarController:
         check_integrity(subdevice_configs)
         self.total_num_LEDs = subdevice_configs[-1]['end_idx']
         self.subdevice_configs = subdevice_configs
-        self.control_interface = DotstarDevice(self.total_num_LEDs, 'linear', color_order, thermal_protection_limit = thermal_protection_limit, max_Hz = max_Hz, bus = bus, device = device, update = update)
+        if not dummy:
+            self.control_interface = DotstarDevice(self.total_num_LEDs, 'linear', color_order, thermal_protection_limit = thermal_protection_limit, max_Hz = max_Hz, bus = bus, device = device, update = update)
 
     def match_sense_vector_on_subdevice(self, cfg, sv, brightness):
         rgbs = brightness * cm.rgb_composition(cfg['l1'], cfg['l2'], cfg['l3'], sv)
@@ -285,12 +286,18 @@ class MultiDotstarController:
         for cfg in self.subdevice_configs:
             self.match_sense_vector_on_subdevice(cfg, sv, brightness)
 
-    def match_planck_spectrum(self, color_temp, brightness):
+    def match_planck_spectrum(self, color_temp, brightness, precompute = False):
         if brightness < 0. or brightness > 1.:
             raise ValueError('Invalid brightness value: ' + str(brightness))
 
+        if precompute:
+            tmp = deepcopy(self.control_interface.LEDs_state)
         sv = cm.sense_vector(cm.planck_spectrum(color_temp))
         self.match_sense_vector(sv, brightness)
+        if precompute:
+            res = deepcopy(self.control_interface.LEDs_state)
+            self.control_interface.unsafe_raw_set_LEDs_state(tmp)
+            return res
 
     def commit_all_off(self):
         self.control_interface.commit_off()
